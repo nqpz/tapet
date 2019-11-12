@@ -75,21 +75,22 @@ module lys: lys with text_content = text_content = {
 
   let render (s: state): [][]i32 =
     let rngs = rnge.split_rng s.n_points s.rng
+    let points = map mk_point rngs
     let ts = i32.min (s.h / s.tiles) (s.w / s.tiles)
     let render_pixel (y: i32) (x: i32): argb.colour =
       let coor1 = (r32 y / r32 ts, r32 x / r32 ts)
-      let mk_d (p: point): f32 =
-        let coor2 = (p.y + p.yd * s.time, p.x + p.xd * s.time)
-        in 1 / (0.5 + dist_sq coor1 coor2) ** (p.p + p.pf * f32.sin (p.pd * s.time))
-      let dsum = reduce_comm (+) 0 (map (mk_d <-< mk_point) rngs)
+      let ds = map (\p ->
+                      let coor2 = (p.y + p.yd * s.time, p.x + p.xd * s.time)
+                      in 1 / (0.5 + dist_sq coor1 coor2) ** (p.p + p.pf * f32.sin (p.pd * s.time))
+                   ) points
+      let dsum = reduce_comm (+) 0 ds
       let (r, g, b) = reduce_comm (\(r1, g1, b1) (r2, g2, b2) ->
                                      (r1 + r2, g1 + g2, b1 + b2)) (0, 0, 0)
-                                  (map (\rng ->
-                                          let p = mk_point rng
-                                          let (r, g, b) = hsl_to_rgb ((p.h + p.hd * s.time) % 1) p.s p.l
-                                          let d = mk_d p / dsum
-                                          in (d * r, d * g, d * b))
-                                       rngs)
+                                  (map2 (\p d ->
+                                           let d' = d / dsum
+                                           let (r, g, b) = hsl_to_rgb ((p.h + p.hd * s.time) % 1) p.s p.l
+                                           in (d' * r, d' * g, d' * b))
+                                       points ds)
       in argb.from_rgba r g b 1
     let pixels = tabulate_2d ts ts render_pixel
     in if s.h == ts && s.w == ts then pixels
