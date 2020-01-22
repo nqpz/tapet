@@ -35,8 +35,8 @@ module lys: lys with text_content = text_content = {
 
   let grab_mouse = false
 
-  let init (seed: i32) (h: i32) (w: i32): state =
-    let rng = rnge.rng_from_seed [seed]
+  let init (seed: u32) (h: i32) (w: i32): state =
+    let rng = rnge.rng_from_seed [i32.u32 seed]
     let (rng, n_points) = mk_n_points rng
     in {time = 0, paused = false, w, h, n_points, rng, tiles=1}
 
@@ -98,7 +98,7 @@ module lys: lys with text_content = text_content = {
 
   type text_content = text_content
 
-  let text_format = "Points: %d\nTiles: %dx\nFPS: %d"
+  let text_format () = "Points: %d\nTiles: %dx\nFPS: %d"
 
   let text_content (render_duration: f32) (s: state): text_content =
     (s.n_points, s.tiles, t32 render_duration)
