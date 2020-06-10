@@ -94,7 +94,7 @@ module lys: lys with text_content = text_content = {
       in argb.from_rgba r g b 1
     let pixels = tabulate_2d ts ts render_pixel
     in if s.h == ts && s.w == ts then pixels
-       else tabulate_2d s.h s.w (\y x -> unsafe pixels[y % ts, x % ts])
+       else tabulate_2d s.h s.w (\y x -> pixels[y % ts, x % ts])
 
   type text_content = text_content
 
