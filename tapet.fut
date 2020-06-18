@@ -38,7 +38,7 @@ module lys: lys with text_content = text_content = {
   let init (seed: u32) (h: i32) (w: i32): state =
     let rng = rnge.rng_from_seed [i32.u32 seed]
     let (rng, n_points) = mk_n_points rng
-    in {time = 0, paused = false, w, h, n_points, rng, tiles=1}
+    in {time=0, paused=false, w, h, n_points, rng, tiles=1}
 
   let resize (h: i32) (w: i32) (s: state): state =
     s with h = h with w = w
