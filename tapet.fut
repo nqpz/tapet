@@ -73,7 +73,7 @@ module lys: lys with text_content = text_content = {
       in f32.min t (1 - t)
     in d y2 y1 ** 2 + d x2 x1 ** 2
 
-  let render (s: state): [][]i32 =
+  let render (s: state): [][]argb.colour =
     let rngs = rnge.split_rng s.n_points s.rng
     let points = map mk_point rngs
     let ts = i32.min (s.h / s.tiles) (s.w / s.tiles)
