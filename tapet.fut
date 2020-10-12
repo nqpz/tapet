@@ -35,13 +35,13 @@ module lys: lys with text_content = text_content = {
 
   let grab_mouse = false
 
-  let init (seed: u32) (h: i32) (w: i32): state =
+  let init (seed: u32) (h: i64) (w: i64): state =
     let rng = rnge.rng_from_seed [i32.u32 seed]
     let (rng, n_points) = mk_n_points rng
-    in {time=0, paused=false, w, h, n_points, rng, tiles=1}
+    in {time=0, paused=false, w=i32.i64 w, h=i32.i64 h, n_points, rng, tiles=1}
 
-  let resize (h: i32) (w: i32) (s: state): state =
-    s with h = h with w = w
+  let resize (h: i64) (w: i64) (s: state): state =
+    s with h = i32.i64 h with w = i32.i64 w
 
   let keydown (key: i32) (s: state): state =
     if key == SDLK_SPACE
@@ -74,7 +74,7 @@ module lys: lys with text_content = text_content = {
     in d y2 y1 ** 2 + d x2 x1 ** 2
 
   let render (s: state): [][]argb.colour =
-    let rngs = rnge.split_rng s.n_points s.rng
+    let rngs = rnge.split_rng (i64.i32 s.n_points) s.rng
     let points = map mk_point rngs
     let ts = i32.min (s.h / s.tiles) (s.w / s.tiles)
     let render_pixel (y: i32) (x: i32): argb.colour =
@@ -92,9 +92,9 @@ module lys: lys with text_content = text_content = {
                                            in (d' * r, d' * g, d' * b))
                                        points ds)
       in argb.from_rgba r g b 1
-    let pixels = tabulate_2d ts ts render_pixel
+    let pixels = tabulate_2d (i64.i32 ts) (i64.i32 ts) (\y x -> render_pixel (i32.i64 y) (i32.i64 x))
     in if s.h == ts && s.w == ts then pixels
-       else tabulate_2d s.h s.w (\y x -> pixels[y % ts, x % ts])
+       else tabulate_2d (i64.i32 s.h) (i64.i32 s.w) (\y x -> pixels[y % i64.i32 ts, x % i64.i32 ts])
 
   type text_content = text_content
 
